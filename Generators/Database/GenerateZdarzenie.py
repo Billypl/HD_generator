@@ -4,7 +4,10 @@ import random
 import pandas as pd
 from pandas import DataFrame
 
+import Data
 from Data import *
+from Utils import get_period_length_in_days
+
 
 # ZDARZENIE
 # DateTime: dt_rozpoczęcia
@@ -30,12 +33,14 @@ class ZdarzeniaMassGenerator:
         self.template_generate_zdarzenia_data(self.generate_dates_lambda)
         self.template_generate_zdarzenia_data(self.generate_location_lambda)
         self.template_generate_zdarzenia_data(self.generate_description_lambda)
+        NUMBER_OF_EVENTS_ALREADY_GENERATED = 0 if Data.CURRENT_PERIOD_NAME == "T1" else int(get_period_length_in_days("T1") * self.zdarzeniaPerDay)
+
         self.csv = pd.DataFrame({
             'StartDate': self.startDates,
             'EndDate': self.endDates,
             'Location': self.locations,
             'Description': self.descriptions,
-            'ID': list(range(periodDateDifference.days * self.zdarzeniaPerDay))
+            'ID': list(range(NUMBER_OF_EVENTS_ALREADY_GENERATED, periodDateDifference.days * self.zdarzeniaPerDay + NUMBER_OF_EVENTS_ALREADY_GENERATED))
         })
         # self.csv = self.csv.sort_values(by='StartDate')
         return self.csv

@@ -9,7 +9,18 @@ from Data import *
 # Column B - Uszkodzenie (enum(Silnik, Szyba, Opona, Elektronika, Zawieszenie, Skrzynia biegów, Wgniecenie, Hamulce))
 # Column C - Czas (datetime)
 
-def choose_date(start_date, end_date, vehicle_data):
+
+def generate_unique_dates(NUMBER_OF_DAMAGES_TO_GENERATE, vehicle_data):
+    dates_set = set()
+    for _ in range(NUMBER_OF_DAMAGES_TO_GENERATE):
+        while True:
+            rng_date = choose_damage_date(*get_period_dates(Data.CURRENT_PERIOD_NAME), vehicle_data)
+            if rng_date not in dates_set:
+                break
+        dates_set.add(rng_date)
+    return list(dates_set)
+
+def choose_damage_date(start_date, end_date, vehicle_data):
     NUMBER_OF_VEHICLES_TO_GENERATE = int(get_period_scaled_number(NUMBER_OF_VEHICLES, Data.CURRENT_PERIOD_NAME))
     random_index = random.randint(0, NUMBER_OF_VEHICLES_TO_GENERATE - 1)
     production_year = vehicle_data.loc[random_index, 'Production-year']
@@ -30,6 +41,6 @@ def generate_awarie(vehicle_data):
         'ID': [i for i in range(NUMBER_OF_DAMAGES_ALREADY_GENERATED, NUMBER_OF_DAMAGES_TO_GENERATE + NUMBER_OF_DAMAGES_ALREADY_GENERATED)],
         'Registration-Number': list(damaged_vehicles),
         'Damage': [random.choice(TYPES_OF_DAMAGE) for _ in range(NUMBER_OF_DAMAGES_TO_GENERATE)],
-        'DateTime': [choose_date(*get_period_dates(Data.CURRENT_PERIOD_NAME), vehicle_data) for _ in range(NUMBER_OF_DAMAGES_TO_GENERATE)]
+        'DateTime': generate_unique_dates(NUMBER_OF_DAMAGES_TO_GENERATE, vehicle_data)
     })
     return damaged_vehicles_data
